@@ -1,0 +1,28 @@
+version: '2'
+services:
+  loadbalancer:
+    image: dockercloud/haproxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 80:80
+    links:
+      - webapi
+
+  postgresql:
+    image: postgres
+    environment:
+      - POSTGRES_USER=railsapi
+      - POSTGRES_DB=railsapi_production
+      - POSTGRES_PASSWORD
+
+  webapi:
+    build: .
+    restart: always
+    depends_on:
+      - postgresql
+    environment:
+      - POSTGRES_PASSWORD
+      - SECRET_KEY_BASE
+      - RAILS_ENV=production
+      - RAILS_LOG_TO_STDOUT=true
